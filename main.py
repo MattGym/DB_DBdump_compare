@@ -284,7 +284,6 @@ def choose_file2():
 # ------- Graphic user interface --------
 # ---------------------------------------
 
-
 file_label1 = Label(root,
                     textvariable=file_path_txt1,
                     width=60,
