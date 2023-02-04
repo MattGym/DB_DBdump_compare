@@ -323,4 +323,22 @@ def compare_address(sheet1, sheet2, no1, no2, file1_col_package, file2_col_packa
     if mark_row is True:
         set_cell_color(sheet1, no1, 1, 'r')
 
-    print('Row ', no2, ' checked')
+
+def compare_description(sheet1, no, sheet2, file1_col_loop, file2_col_tag, file1_col_description,
+                        file2_col_description, max_rows2):
+    found = False
+    for i in range(2, max_rows2+1):
+        if get_cell_value(sheet1, no, file1_col_loop) == get_cell_value(sheet2, i, file2_col_tag):
+            found = True
+            if get_cell_value(sheet1, no, file1_col_description) != get_cell_value(sheet2, i, file2_col_description):
+                if str(get_cell_value(sheet1, no, file1_col_description)) not in \
+                        str(get_cell_value(sheet2, i, file2_col_description)):
+                    set_cell_color(sheet1, no, file1_col_description, 'r')
+                    set_cell_comment(sheet1, no, file1_col_description, 'Other description' + ' in DB is in a row'
+                                     + str(i) + ' (' + str(get_cell_value(sheet2, i, file2_col_tag)) + ')\n ' +
+                                     str(get_cell_value(sheet2, i, file2_col_description)), add=False)
+                    set_cell_color(sheet1, no, 1, 'r')
+    if found is False:
+        set_cell_color(sheet1, no, 1, 'g')
+        set_cell_comment(sheet1, no, 1, 'Additional loop according to DB')
+

@@ -55,6 +55,7 @@ max_rows1 = 0
 max_col1 = 0
 
 file1_col_tag = 0
+file1_col_loop = 0
 file1_col_package = 0
 file1_col_description = 0
 file1_col_min = 0
@@ -130,9 +131,9 @@ def analyze_file():
         numbers1 = [file1_col_min, file1_col_max, file1_col_fbc, file1_col_ibc, file1_col_card, file1_col_channel,
                     file1_col_modbus_address, file1_col_bit, file1_col_gain, file1_col_slave]
         string1 = []
-        txt1 = [file1_col_tag, file1_col_package, file1_col_description, file1_col_unit,file1_col_signal_type,
-                file1_col_package, file1_col_instrument_code, file1_col_link_signal_type]
-        
+        txt1 = [file1_col_tag, file1_col_loop, file1_col_package, file1_col_description, file1_col_unit,
+                file1_col_signal_type, file1_col_package, file1_col_instrument_code, file1_col_link_signal_type]
+
         spaces2 = [file2_col_tag, file2_col_iotype, file2_col_package, file2_col_max, file2_col_fbc,
                    file2_col_ibc, file2_col_card, file2_col_channel, file2_col_instrument_code,
                    file2_col_modbus_address, file2_col_bit, file2_col_gain, file2_col_slave, file2_col_link_signal_type]
@@ -142,9 +143,9 @@ def analyze_file():
         txt2 = [file2_col_tag, file2_col_seq, file2_col_package, file2_col_description, file2_col_unit,
                 file2_col_package,
                 file2_col_instrument_code, file2_col_link_signal_type]
-#        remove_sign(active_sheet1, spaces1, max_rows1)
-#        variable_type_update(active_sheet1, numbers1, string1, txt1, max_rows1)
-#        wb1.save(file_path1)
+        remove_sign(active_sheet1, spaces1, max_rows1)
+        variable_type_update(active_sheet1, numbers1, string1, txt1, max_rows1)
+        wb1.save(file_path1)
 
         remove_sign(active_sheet2, spaces2, max_rows2)
         variable_type_update(active_sheet2, numbers2, string2, txt2, max_rows2)
@@ -152,18 +153,22 @@ def analyze_file():
 
         if checkbox2_var.get() == 1:
             for i in range(2, max_rows2+1):
-                print(i)
                 no1 = search_row_in_dump(active_sheet1, active_sheet2, i, file1_col_tag, file2_col_tag, file2_col_seq,
-                                        max_rows1)
+                                         max_rows1)
                 if no1 != 0:
-                    compare_address(active_sheet1, active_sheet2, no1, i, file1_col_package, file2_col_package, file1_col_fbc,
-                                file2_col_fbc, file1_col_ibc, file2_col_ibc, file1_col_card, file2_col_card,
-                                file1_col_channel, file2_col_channel, file2_col_iotype, file1_col_modbus_address,
-                                file2_col_modbus_address, file1_col_bit, file2_col_bit, file1_col_gain,
-                                file2_col_gain, file1_col_slave, file2_col_slave)
-                if no1 == 0:
+                    compare_address(active_sheet1, active_sheet2, no1, i, file1_col_package, file2_col_package,
+                                    file1_col_fbc, file2_col_fbc, file1_col_ibc, file2_col_ibc, file1_col_card,
+                                    file2_col_card, file1_col_channel, file2_col_channel, file2_col_iotype,
+                                    file1_col_modbus_address, file2_col_modbus_address, file1_col_bit, file2_col_bit,
+                                    file1_col_gain, file2_col_gain, file1_col_slave, file2_col_slave)
+                if no1 == 0 and 'TREAT' not in str(get_cell_value(active_sheet2, i, file2_col_iotype)):
                     set_cell_color(active_sheet2, i, 1, 'r')
                     set_cell_comment(active_sheet2, i, 1, 'Missing in DB')
+
+        if checkbox3_var.get() == 1:
+            for i in range(2, max_rows1+1):
+                compare_description(active_sheet1, i, active_sheet2, file1_col_loop, file2_col_tag,
+                                    file1_col_description, file2_col_description, max_rows2)
 
         print('saving 1st ')
         wb1.save(file_path1)
@@ -175,6 +180,7 @@ def analyze_file():
 def fill_col_numbers():
     # DNA DUMP
     global file1_col_tag
+    global  file1_col_loop
     global file1_col_package
     global file1_col_description
     global file1_col_min
@@ -212,6 +218,7 @@ def fill_col_numbers():
     global file2_col_link_signal_type
 
     file1_col_tag = get_col_no(active_sheet1, '$(TAG)', max_col1)
+    file1_col_loop = get_col_no(active_sheet1, '$(LOOP)', max_col1)
     file1_col_package = get_col_no(active_sheet1, '$(PACKAGE)', max_col1)
     file1_col_description = get_col_no(active_sheet1, '$(NAME)', max_col1)
     file1_col_min = get_col_no(active_sheet1, '$(MIN)', max_col1)
@@ -284,11 +291,8 @@ def choose_file2():
 # ------- Graphic user interface --------
 # ---------------------------------------
 
-file_label1 = Label(root,
-                    textvariable=file_path_txt1,
-                    width=60,
-                    anchor='w',
-                    relief='groove')
+
+file_label1 = Label(root, textvariable=file_path_txt1, width=60, anchor='w', relief='groove')
 file_label1.place(x=10, y=20)
 sheet_choose_select1 = tkinter.StringVar()
 sheet_choose1 = ttk.Combobox(root, textvariable=sheet_choose_select1, width=10, height=1)
@@ -298,11 +302,7 @@ button_select1.place(x=540, y=17)
 
 button_select2 = Button(root, text='Select', command=choose_file2, height=1, width=10)
 button_select2.place(x=540, y=47)
-file_label2 = Label(root,
-                    textvariable=file_path_txt2,
-                    width=60,
-                    anchor='w',
-                    relief='groove')
+file_label2 = Label(root, textvariable=file_path_txt2, width=60, anchor='w', relief='groove')
 
 file_label2.place(x=10, y=49)
 sheet_choose_select2 = tkinter.StringVar()
@@ -318,13 +318,18 @@ labelframe1.place(x=10, y=80)
 checkbox1_var = IntVar(root, 1)
 checkbox1 = Checkbutton(root, text='Remove spaces and correct types', variable=checkbox1_var, onvalue=1,
                         offvalue=0, height=1, state=DISABLED)
-checkbox1.place(x=20, y=100)
+checkbox1.place(x=20, y=95)
 checkbox1_tt = CreateToolTip(checkbox1, "(Mandatory) removes spaces from cells and correcting datatypes.")
 
 checkbox2_var = IntVar(root, 1)
 checkbox2 = Checkbutton(root, text='Check IO HW and LINK address', variable=checkbox2_var, onvalue=1,
                         offvalue=0, height=1)
 checkbox2.place(x=20, y=120)
-checkbox2_tt = CreateToolTip(checkbox1, "Search for difference between DUMP and DB")
+checkbox2_tt = CreateToolTip(checkbox2, "Search for difference between DUMP and DB")
 
+checkbox3_var = IntVar(root, 1)
+checkbox3 = Checkbutton(root, text='Description check', variable=checkbox3_var, onvalue=1,
+                        offvalue=0, height=1)
+checkbox3.place(x=20, y=145)
+checkbox3_tt = CreateToolTip(checkbox3, "Search for difference between DUMP and DB description")
 root.mainloop()
