@@ -20,6 +20,7 @@ def get_col_no(sheet, desc, max_col):
             return s+1
     return 0
 
+
 def set_cell_color(sheet, row, col, color_rgn='n'):
     """
     Change cell background color on 'r'-red, 'g'-green, 'n'-none.
@@ -121,8 +122,7 @@ def set_cell_comment(sheet, row, col, commentary, add=False, delete=False):
         comment.height = 150
         sheet.cell(row=row, column=col).comment = comment
     if delete is True:
-        comment = Comment.unbind(comment)
-        sheet.cell(row=row, column=col).comment = comment
+        sheet.cell(row=row, column=col).comment = None
 
 
 def remove_sign(sheet, col, max_row, sign=' '):
@@ -215,7 +215,7 @@ def search_row_in_dump(sheet1, sheet2, no, file1_col_tag, file2_col_tag, file2_c
     file2_col_seq : int
         column number with SEQ no in DB from CdA
     max_rows1
-        numbers of rows in DUMP drom CdA
+        numbers of rows in DUMP from CdA
     """
     row_found = 0
     loop_name = get_cell_value(sheet2, no, file2_col_tag) + '.' + str(int(get_cell_value(sheet2, no, file2_col_seq)))
@@ -326,6 +326,28 @@ def compare_address(sheet1, sheet2, no1, no2, file1_col_package, file2_col_packa
 
 def compare_description(sheet1, no, sheet2, file1_col_loop, file2_col_tag, file1_col_description,
                         file2_col_description, max_rows2):
+    """
+    Function 'compare description' compares description between DB dump and CdA DB
+    Parameters
+    ----------
+    sheet1 : workbook
+        active sheet name DUMP from DNA
+    no : int
+        row number of searched row from CdA DB
+    sheet2 : workbook
+        active sheet name CdA DB
+
+    file1_col_loop : int
+        column number with TAG name in DUMP from DNA
+    file2_col_tag : int
+        column number with TAG name in DB from CdA
+    file1_col_description : int
+        column number with Description column in DB Dump from DNA
+    file2_col_description : int
+        column number with Description column in DB from CdA
+    max_rows2
+        numbers of rows in DB from CdA
+    """
     found = False
     for i in range(2, max_rows2+1):
         if get_cell_value(sheet1, no, file1_col_loop) == get_cell_value(sheet2, i, file2_col_tag):
