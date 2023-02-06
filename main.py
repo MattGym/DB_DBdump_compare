@@ -1,5 +1,4 @@
 # Program do porównywania db dumpa oraz bazy danych dostarczonej przez stocznię.
-#tes
 
 import openpyxl
 # from openpyxl.comments import Comment
