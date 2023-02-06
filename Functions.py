@@ -227,6 +227,7 @@ def search_row_in_dump(sheet1, sheet2, no, file1_col_tag, file2_col_tag, file2_c
     return row_found
 
 
+
 def compare_address(sheet1, sheet2, no1, no2, file1_col_package, file2_col_package, file1_col_fbc, file2_col_fbc,
                     file1_col_ibc, file2_col_ibc, file1_col_card, file2_col_card, file1_col_channel, file2_col_channel,
                     file2_col_iotype, file1_col_modbus_address, file2_col_modbus_address, file1_col_bit,
