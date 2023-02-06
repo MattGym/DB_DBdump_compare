@@ -73,8 +73,6 @@ file1_col_gain = 0
 file1_col_slave = 0
 file1_col_link_signal_type = 0
 
-
-
 # File 2 Variables
 file_path2 = ''
 file_path_txt2 = StringVar()
@@ -122,8 +120,7 @@ def analyze_file():
     fill_col_numbers()
     print(file_path1)
     print(file_path2)
-    print('F1_col_modbusaddress', file1_col_modbus_address)
-    print('F2_col_FBC', file2_col_fbc)
+
     if checkbox1_var.get() == 1:
         spaces1 = [file1_col_tag, file1_col_package, file1_col_min, file1_col_max, file1_col_fbc, file1_col_ibc,
                    file1_col_card, file1_col_channel, file1_col_instrument_code, file1_col_signal_type,
@@ -151,24 +148,24 @@ def analyze_file():
         variable_type_update(active_sheet2, numbers2, string2, txt2, max_rows2)
         wb2.save(file_path2)
 
-        if checkbox2_var.get() == 1:
-            for i in range(2, max_rows2+1):
-                no1 = search_row_in_dump(active_sheet1, active_sheet2, i, file1_col_tag, file2_col_tag, file2_col_seq,
-                                         max_rows1)
-                if no1 != 0:
-                    compare_address(active_sheet1, active_sheet2, no1, i, file1_col_package, file2_col_package,
-                                    file1_col_fbc, file2_col_fbc, file1_col_ibc, file2_col_ibc, file1_col_card,
-                                    file2_col_card, file1_col_channel, file2_col_channel, file2_col_iotype,
-                                    file1_col_modbus_address, file2_col_modbus_address, file1_col_bit, file2_col_bit,
-                                    file1_col_gain, file2_col_gain, file1_col_slave, file2_col_slave)
-                if no1 == 0 and 'TREAT' not in str(get_cell_value(active_sheet2, i, file2_col_iotype)):
-                    set_cell_color(active_sheet2, i, 1, 'r')
-                    set_cell_comment(active_sheet2, i, 1, 'Missing in DB')
+    if checkbox2_var.get() == 1:
+        for i in range(2, max_rows2+1):
+            no1 = search_row_in_dump(active_sheet1, active_sheet2, i, file1_col_tag, file2_col_tag, file2_col_seq,
+                                     max_rows1)
+            if no1 != 0:
+                compare_address(active_sheet1, active_sheet2, no1, i, file1_col_package, file2_col_package,
+                                file1_col_fbc, file2_col_fbc, file1_col_ibc, file2_col_ibc, file1_col_card,
+                                file2_col_card, file1_col_channel, file2_col_channel, file2_col_iotype,
+                                file1_col_modbus_address, file2_col_modbus_address, file1_col_bit, file2_col_bit,
+                                file1_col_gain, file2_col_gain, file1_col_slave, file2_col_slave)
+            if no1 == 0 and 'TREAT' not in str(get_cell_value(active_sheet2, i, file2_col_iotype)):
+                set_cell_color(active_sheet2, i, 1, 'r')
+                set_cell_comment(active_sheet2, i, 1, 'Missing in DB')
 
-        if checkbox3_var.get() == 1:
-            for i in range(2, max_rows1+1):
-                compare_description(active_sheet1, i, active_sheet2, file1_col_loop, file2_col_tag,
-                                    file1_col_description, file2_col_description, max_rows2)
+    if checkbox3_var.get() == 1:
+        for i in range(2, max_rows1+1):
+            compare_description(active_sheet1, i, active_sheet2, file1_col_loop, file2_col_tag,
+                                file1_col_description, file2_col_description, max_rows2)
 
         print('saving 1st ')
         wb1.save(file_path1)
