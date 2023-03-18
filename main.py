@@ -31,7 +31,7 @@ class CreateToolTip(object):
         self.tw.wm_overrideredirect(True)
         self.tw.wm_geometry("+%d+%d" % (x, y))
         label = tkinter.Label(self.tw, text=self.text, justify='left', relief='solid', borderwidth=1,
-                              font=("times", "9", "normal"))
+                              font=("times", "15", "normal"))
         label.pack(ipadx=1)
 
     def close(self, event=None):
@@ -41,7 +41,7 @@ class CreateToolTip(object):
 
 # Graphic animation function
 root = Tk(className=' CdA DataBase Comparator')
-root.geometry('725x185')
+root.geometry('790x185')
 root.resizable(False, False)
 # Variables
 # File 1 Variables
@@ -109,6 +109,9 @@ def analyze_file():
     global active_sheet2
     global max_rows2
     global max_col2
+    CDA_list = [0,0]
+    DB_list = [0,0]
+
     wb1.active = wb1[sheet_choose1.get()]
     active_sheet1 = wb1.active
     max_rows1 = wb1.active.max_row
@@ -121,12 +124,29 @@ def analyze_file():
     print(file_path1)
     print(file_path2)
 
+    for i in range(2, max_rows2 + 1):
+        DB_list.append(search_row_in_dump(active_sheet1, active_sheet2, i, file1_col_tag, file2_col_tag, file2_col_seq,
+                                          max_rows1))
+    if file1_col_fbc == 0:
+        checkbox2_var.set(value=0)
+        tkinter.messagebox.showwarning(title='Warrning', message='No HW signals in DB dump, '
+                                                                 'check for them will be not performed.')
+
+    if file1_col_modbus_address == 0:
+        checkbox3_var.set(value=0)
+        tkinter.messagebox.showwarning(title='Warrning', message='No LINK signals in DB dump, '
+                                                                 'check for them will be not performed.')
+
     if checkbox1_var.get() == 1:
-        spaces1 = [file1_col_tag, file1_col_package, file1_col_min, file1_col_max, file1_col_fbc, file1_col_ibc,
-                   file1_col_card, file1_col_channel, file1_col_instrument_code, file1_col_signal_type,
-                   file1_col_modbus_address, file1_col_bit, file1_col_gain, file1_col_slave, file1_col_link_signal_type]
-        numbers1 = [file1_col_min, file1_col_max, file1_col_fbc, file1_col_ibc, file1_col_card, file1_col_channel,
-                    file1_col_modbus_address, file1_col_bit, file1_col_gain, file1_col_slave]
+        spaces1hw = [file1_col_fbc, file1_col_ibc, file1_col_card, file1_col_channel]
+        spaces1link = [file1_col_modbus_address, file1_col_bit, file1_col_gain, file1_col_slave,
+                       file1_col_link_signal_type]
+        spaces1 = [file1_col_tag, file1_col_package, file1_col_min, file1_col_max, file1_col_instrument_code,
+                   file1_col_signal_type]
+        numbers1hw = [file1_col_fbc, file1_col_ibc, file1_col_card, file1_col_channel]
+        numbers1link = [file1_col_modbus_address, file1_col_bit, file1_col_gain, file1_col_slave]
+        numbers1 = [file1_col_min, file1_col_max]
+
         string1 = []
         txt1 = [file1_col_tag, file1_col_loop, file1_col_package, file1_col_description, file1_col_unit,
                 file1_col_signal_type, file1_col_package, file1_col_instrument_code, file1_col_link_signal_type]
@@ -141,6 +161,12 @@ def analyze_file():
                 file2_col_package,
                 file2_col_instrument_code, file2_col_link_signal_type]
         remove_sign(active_sheet1, spaces1, max_rows1)
+        if checkbox2_var.get() == 1:
+            remove_sign(active_sheet1, spaces1hw, max_rows1)
+            variable_type_update(active_sheet1, numbers1hw, string1, [], max_rows1)
+        if checkbox3_var.get() == 1:
+            remove_sign(active_sheet1, spaces1link, max_rows1)
+            variable_type_update(active_sheet1, numbers1link, string1, [], max_rows1)
         variable_type_update(active_sheet1, numbers1, string1, txt1, max_rows1)
         wb1.save(file_path1)
 
@@ -162,7 +188,7 @@ def analyze_file():
                 set_cell_color(active_sheet2, i, 1, 'r')
                 set_cell_comment(active_sheet2, i, 1, 'Missing in DB')
 
-    if checkbox3_var.get() == 1:
+    if checkbox4_var.get() == 1:
         for i in range(2, max_rows1+1):
             compare_description(active_sheet1, i, active_sheet2, file1_col_loop, file2_col_tag,
                                 file1_col_description, file2_col_description, max_rows2)
@@ -177,7 +203,7 @@ def analyze_file():
 def fill_col_numbers():
     # DNA DUMP
     global file1_col_tag
-    global  file1_col_loop
+    global file1_col_loop
     global file1_col_package
     global file1_col_description
     global file1_col_min
@@ -289,44 +315,50 @@ def choose_file2():
 # ---------------------------------------
 
 
-file_label1 = Label(root, textvariable=file_path_txt1, width=60, anchor='w', relief='groove')
+file_label1 = Label(root, textvariable=file_path_txt1, width=50, anchor='w', relief='groove')
 file_label1.place(x=10, y=20)
 sheet_choose_select1 = tkinter.StringVar()
 sheet_choose1 = ttk.Combobox(root, textvariable=sheet_choose_select1, width=10, height=1)
-sheet_choose1.place(x=445, y=19)
-button_select1 = Button(root, text='Select', command=choose_file1, height=1, width=10)
-button_select1.place(x=540, y=17)
+sheet_choose1.place(x=470, y=17)
+button_select1 = Button(root, text='Select', command=choose_file1, height=1, width=5)
+button_select1.place(x=590, y=16)
 
-button_select2 = Button(root, text='Select', command=choose_file2, height=1, width=10)
-button_select2.place(x=540, y=47)
-file_label2 = Label(root, textvariable=file_path_txt2, width=60, anchor='w', relief='groove')
+button_select2 = Button(root, text='Select', command=choose_file2, height=1, width=5)
+button_select2.place(x=590, y=46)
+file_label2 = Label(root, textvariable=file_path_txt2, width=50, anchor='w', relief='groove')
 
 file_label2.place(x=10, y=49)
 sheet_choose_select2 = tkinter.StringVar()
 sheet_choose2 = ttk.Combobox(root, textvariable=sheet_choose_select2, width=10, height=1)
-sheet_choose2.place(x=445, y=49)
+sheet_choose2.place(x=470, y=47)
 
-button_analyze = Button(root, text='Analyze', command=analyze_file, height=3, width=10, state=tkinter.DISABLED)
-button_analyze.place(x=635, y=17)
+button_analyze = Button(root, text='Analyze', command=analyze_file, height=3, width=8, state=tkinter.DISABLED)
+button_analyze.place(x=675, y=17)
 
-labelframe1 = ttk.Labelframe(root, width=705, height=95, labelanchor=NW, text='Check options')
+labelframe1 = ttk.Labelframe(root, width=770, height=95, labelanchor=NW, text='Check options')
 labelframe1.place(x=10, y=80)
 
 checkbox1_var = IntVar(root, 1)
 checkbox1 = Checkbutton(root, text='Remove spaces and correct types', variable=checkbox1_var, onvalue=1,
                         offvalue=0, height=1, state=DISABLED)
-checkbox1.place(x=20, y=95)
+checkbox1.place(x=20, y=105)
 checkbox1_tt = CreateToolTip(checkbox1, "(Mandatory) removes spaces from cells and correcting datatypes.")
 
 checkbox2_var = IntVar(root, 1)
-checkbox2 = Checkbutton(root, text='Check IO HW and LINK address', variable=checkbox2_var, onvalue=1,
+checkbox2 = Checkbutton(root, text='Check IO HW address', variable=checkbox2_var, onvalue=1,
                         offvalue=0, height=1)
-checkbox2.place(x=20, y=120)
+checkbox2.place(x=20, y=127)
 checkbox2_tt = CreateToolTip(checkbox2, "Search for difference between DUMP and DB")
 
 checkbox3_var = IntVar(root, 1)
-checkbox3 = Checkbutton(root, text='Description check', variable=checkbox3_var, onvalue=1,
+checkbox3 = Checkbutton(root, text='Check IO LINK address', variable=checkbox3_var, onvalue=1,
                         offvalue=0, height=1)
-checkbox3.place(x=20, y=145)
+checkbox3.place(x=20, y=149)
 checkbox3_tt = CreateToolTip(checkbox3, "Search for difference between DUMP and DB description")
+
+checkbox4_var = IntVar(root, 1)
+checkbox4 = Checkbutton(root, text='Description check', variable=checkbox4_var, onvalue=1,
+                        offvalue=0, height=1)
+checkbox4.place(x=260, y=105)
+checkbox4_tt = CreateToolTip(checkbox4, "Search for difference between DUMP and DB description")
 root.mainloop()
