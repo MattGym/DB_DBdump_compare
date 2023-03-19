@@ -226,6 +226,7 @@ def search_row_in_dump(sheet1, sheet2, no, file1_col_tag, file2_col_tag, file2_c
     return row_found
 
 
+
 def search_row_in_db(sheet1, sheet2, no, file1_col_loop, file2_col_tag, max_rows2):
     print('dalej jechac z funkcja')
 
