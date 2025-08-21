@@ -10,7 +10,7 @@ from tkinter import *
 from tkinter import filedialog
 from tkinter import ttk
 from tkinter import messagebox
-
+from Functions_global import *
 from Functions import *
 
 
@@ -40,7 +40,7 @@ class CreateToolTip(object):
 
 
 # Graphic animation function
-root = Tk(className=' CdA DataBase Comparator')
+root = Tk(className=' CdA DataBase Comparator old version')
 root.geometry('790x185')
 root.resizable(False, False)
 # Variables
