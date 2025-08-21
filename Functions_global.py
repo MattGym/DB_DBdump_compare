@@ -4,6 +4,8 @@ from tkinter import messagebox
 import openpyxl
 
 
+
+
 def clean_all(sheet, col_pcs, col_signed_unsigned, col_signal, max_col, max_row):
     """
     Cleaning cells from description and color
